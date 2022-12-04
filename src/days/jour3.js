@@ -1,37 +1,54 @@
-import { input, inputEx } from "data/input3"
-import { getNbOccurrence, transposeArraysOfArrays } from "util/array"
+import { input, inputEx } from "../data/input3"
+import { reducerSum } from "../util/array"
 
-const dataBrut = input.split("\n").map((a) => a.split(""))
-
-const getNbOccurrence0 = (a) => getNbOccurrence(a, "0")
-const getNbOccurrence1 = (a) => getNbOccurrence(a, "1")
-const getMaxOccurrence = (a) =>
-  getNbOccurrence1(a) >= getNbOccurrence0(a) ? "1" : "0"
-const getMinOccurrence = (a) =>
-  getNbOccurrence1(a) >= getNbOccurrence0(a) ? "0" : "1"
-
-const calcul = (arr, fonctionRecherche = getMaxOccurrence) => {
-  let resultat = [...arr]
-  let position = 0
-  while (resultat.length > 1) {
-    const arrTranspose = transposeArraysOfArrays(resultat)
-    const recherche = fonctionRecherche(arrTranspose[position])
-    // eslint-disable-next-line no-loop-func
-    resultat = resultat.filter((a) => a[position] === recherche)
-    position++
+const data = input.split("\n").map((a) => {const l=a.split("").length ;return [a.substring(0,l/2),a.substring(l/2)]});
+const dataInter = input.split("\n");
+const getdata3 = (array) => {
+  let a = [];
+  for (let index = 0; index <(array.length + 1 /3) - 1; index+=3) {
+    a.push([array[index], array[index+1], array[index+2]]);
   }
-  return resultat[0].join("")
+  return a;
 }
+
+const position = (chaine) => {
+  const positionInit = chaine.charCodeAt(0);
+  return positionInit >= 97 ? positionInit - 96 : positionInit - 65 + 27;
+}
+
+function match([s1, s2]) {
+  let a = "";
+  for(let i in s1) {
+      if (s2.includes(s1[i])) a+=s1[i] ;
+  }
+  return a ;
+}
+
 function result1() {
-  let data = transposeArraysOfArrays(dataBrut)
-  const gamma = data.map((a) => getMaxOccurrence(a)).join("")
-  const epsilon = data.map((a) => getMinOccurrence(a)).join("")
-  return parseInt(gamma, 2) * parseInt(epsilon, 2)
+  // console.log(data);
+  const communs = data.map(a=> match(a));
+  // console.log({communs});
+  const positions = communs.map(a=> position(a));
+  // console.log({positions});
+  return positions.reduce(reducerSum);
 }
+
 function result2() {
-  let oxygen = calcul(dataBrut)
-  let co2 = calcul(dataBrut, getMinOccurrence)
-  return parseInt(oxygen, 2) * parseInt(co2, 2)
+  const data3 = getdata3(dataInter);
+  // console.log({data3})
+  
+  const communs = data3.map(a=>  match([
+      match([a[0], a[1]]), 
+      a[2]
+    ])
+  );
+  
+  // console.log({communs})
+  
+  const positions = communs.map(a=> position(a));
+  // console.log({positions});
+  return positions.reduce(reducerSum);
+  // return 0;
 }
 export default function getResultats() {
   return [result1(), result2()]

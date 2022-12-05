@@ -3,7 +3,7 @@ import jour1 from "./days/jour1";
 import jour2 from "./days/jour2";
 import jour3 from "./days/jour3";
 import jour4 from "./days/jour4";
-import jour5 from "./days/jour5"
+import jour5 from "./days/jour5";
 // import jour6 from "./days/jour6"
 // import jour7 from "./days/jour7"
 // import jour8 from "./days/jour8"
@@ -55,15 +55,18 @@ function App() {
     <div className="App">
       <header className="App-header">
         <table>
-          {tableauResultats.map((jour, i) => {
-            return (
-              <tr key={i}>
-                <td>{"jour" + (tableauResultats.length - i)}</td>
-                <td>{jour[0]}</td>
-                <td>{jour[1]}</td>
-              </tr>
-            );
-          })}
+          <tbody>
+            {" "}
+            {tableauResultats.map((jour, i) => {
+              return (
+                <tr key={i}>
+                  <td>{"jour" + (tableauResultats.length - i)}</td>
+                  <td>{jour[0]}</td>
+                  <td>{jour[1]}</td>
+                </tr>
+              );
+            })}
+          </tbody>
         </table>
       </header>
     </div>

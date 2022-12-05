@@ -1,7 +1,10 @@
 import { input, inputEx } from "../data/input6";
 import { reducerSum, transposeArraysOfArrays } from "../util/array";
 
-const data = input.split("\n");
+const instructions = input1Ex.split("\n").map(a=> {
+  const re = new RegExp('move 1 from 2 to 1');
+  return ""
+});
 
 function result1() {
   console.log({data});

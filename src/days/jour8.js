@@ -1,67 +1,161 @@
-import { input, inputEx } from "data/input8"
-import { intersectArray, reducerSum } from "util/array"
+import { input, inputEx } from "../data/input8";
+import { reducerMax, reducerSum, transposeArraysOfArrays } from "../util/array";
 
-const dataInit = (inp) =>
-  inp.split("\n").map((a) =>
-    a.split(" | ").map((a) =>
-      a
-        .trim()
-        .split(" ")
-        .map((b) => b.split("").sort().join(""))
-    )
-  )
+const matrice = input
+  .split("\n")
+  .map((a) => a.split("").map((b) => parseInt(b, 10)));
 
-const devinerDigits = (ligne) => {
-  const longueur2 = ligne.filter((a) => a.length === 2)
-  const longueur3 = ligne.filter((a) => a.length === 3)
-  const longueur4 = ligne.filter((a) => a.length === 4)
-  const longueur5 = ligne.filter((a) => a.length === 5)
-  const longueur6 = ligne.filter((a) => a.length === 6)
-  const longueur7 = ligne.filter((a) => a.length === 7)
-  const digits = []
-  const deleteDigitFromArray = (arr, digit) =>
-    arr.splice(arr.indexOf(digits[digit]), 1)
-  const isDigitIntersect = (a, digit) =>
-    intersectArray(a.split(""), digits[digit].split("")).length ===
-    digits[digit].length
-  const isDigitIntersect3 = (a, digit) =>
-    intersectArray(a.split(""), digits[digit].split("")).length === 3
-  digits[1] = longueur2[0]
-  digits[7] = longueur3[0]
-  digits[4] = longueur4[0]
-  digits[8] = longueur7[0]
-  digits[3] = longueur5.find((a) => isDigitIntersect(a, 1))
-  deleteDigitFromArray(longueur5, 3)
-  digits[9] = longueur6.find((a) => isDigitIntersect(a, 4))
-  deleteDigitFromArray(longueur6, 9)
-  digits[0] = longueur6.find((a) => isDigitIntersect(a, 7))
-  deleteDigitFromArray(longueur6, 0)
-  digits[6] = longueur6[0]
-  digits[5] = longueur5.find((a) => isDigitIntersect3(a, 4))
-  deleteDigitFromArray(longueur5, 5)
-  digits[2] = longueur5[0]
-  return digits
-}
 function result1() {
-  const data = dataInit(input)
-  const fourDigits = data.map((a) => a[1])
-  const easyDigits = fourDigits.map((a) =>
-    a.filter((d) => [2, 3, 4, 7].includes(d.length))
-  )
-  const result = easyDigits.map((a) => a.length).reduce(reducerSum)
-  return result
+  const matriceVisibles = getMatriceResultat(matrice, getVisible);
+  let result = matriceVisibles
+    .map((a) => a.reduce(reducerSum))
+    .reduce(reducerSum);
+
+  return result;
 }
 function result2() {
-  const data = dataInit(input)
-  const tenDigits = data.map((a) => a[0])
-  const fourDigits = data.map((a) => a[1])
-  const digits = tenDigits.map((ligne) => devinerDigits(ligne))
-  const signals = fourDigits.map((a, index) =>
-    a.map((b) => digits[index].indexOf(b)).join("")
-  )
-  const result = signals.map((a) => parseInt(a)).reduce(reducerSum)
-  return result
+  const matriceScenic = getMatriceResultat(matrice, getScenic);
+  let result = matriceScenic
+    .map((a) => a.reduce(reducerMax))
+    .reduce(reducerMax);
+  return result;
 }
 export default function getResultats() {
-  return [result1(), result2()]
+  return [result1(), result2()];
 }
+
+const getMatriceResultat = (matrice, fonction = getVisible) => {
+  const matriceVisibles = [...matrice].map((a) => a.map((b) => 1));
+  const matriceT = transposeArraysOfArrays(matrice);
+  for (let i = 1; i < matrice.length - 1; i++) {
+    const ligne = matrice[i];
+    for (let j = 1; j < ligne.length - 1; j++) {
+      matriceVisibles[i][j] = fonction({
+        ligne,
+        colonne: matriceT[j],
+        i: j,
+        j: i,
+      });
+    }
+  }
+  return matriceVisibles;
+};
+
+const getVisible = ({ ligne, colonne, i, j }) => {
+  const element = ligne[i];
+  if (element === 0) return 0;
+
+  const fonctionColonneDebut = () =>
+    getVisibleDirectionDebut({ direction: colonne, index: j });
+  const fonctionColonneFin = () =>
+    getVisibleDirectionFin({ direction: colonne, index: j });
+  const fonctionLigneDebut = () =>
+    getVisibleDirectionDebut({ direction: ligne, index: i });
+  const fonctionLigneFin = () =>
+    getVisibleDirectionFin({ direction: ligne, index: i });
+
+  let fonction1;
+  let fonction2;
+  let fonction3;
+  let fonction4;
+
+  switch (i) {
+    case i < ligne.length / 2:
+      fonction1 = fonctionLigneDebut;
+      fonction4 = fonctionLigneFin;
+      break;
+    default:
+      fonction1 = fonctionLigneFin;
+      fonction4 = fonctionLigneDebut;
+      break;
+  }
+  switch (j) {
+    case j < colonne.length / 2:
+      fonction2 = fonctionColonneDebut;
+      fonction3 = fonctionColonneFin;
+      break;
+    default:
+      fonction2 = fonctionColonneFin;
+      fonction3 = fonctionColonneDebut;
+      break;
+  }
+
+  const fonctions = [fonction1, fonction2, fonction3, fonction4];
+  for (let index = 0; index < fonctions.length; index++) {
+    if (fonctions[index]()) return 1;
+  }
+  return 0;
+};
+
+const getVisibleDirectionDebut = ({ direction, index }) => {
+  const element = direction[index];
+  let visible = true;
+  let indexTop = 0;
+  while (visible && indexTop !== index) {
+    visible = element > direction[indexTop];
+    indexTop++;
+  }
+  return visible;
+};
+
+const getVisibleDirectionFin = ({ direction, index }) => {
+  const element = direction[index];
+  let visible = true;
+  let indexTop = direction.length - 1;
+  while (visible && indexTop !== index) {
+    visible = element > direction[indexTop];
+    indexTop--;
+  }
+  return visible;
+};
+
+const getScenic = ({ ligne, colonne, i, j }) => {
+  const nbDansColonneAvant = getScenicDirectionApres({
+    direction: colonne,
+    index: j,
+  });
+  const nbDansColonneApres = getScenicDirectionAvant({
+    direction: colonne,
+    index: j,
+  });
+  const nbDansLigneAvant = getScenicDirectionApres({
+    direction: ligne,
+    index: i,
+  });
+  const nbDansLigneApres = getScenicDirectionAvant({
+    direction: ligne,
+    index: i,
+  });
+  return (
+    nbDansColonneAvant *
+    nbDansColonneApres *
+    nbDansLigneAvant *
+    nbDansLigneApres
+  );
+};
+
+const getScenicDirectionApres = ({ direction, index }) => {
+  const element = direction[index];
+  let visible = true;
+  let indexTop = index + 1;
+  let count = 0;
+  while (visible && indexTop !== direction.length) {
+    visible = element > direction[indexTop];
+    indexTop++;
+    count++;
+  }
+  return count;
+};
+
+const getScenicDirectionAvant = ({ direction, index }) => {
+  const element = direction[index];
+  let visible = true;
+  let indexTop = index - 1;
+  let count = 0;
+  while (visible && indexTop !== -1) {
+    visible = element > direction[indexTop];
+    indexTop--;
+    count++;
+  }
+  return count;
+};

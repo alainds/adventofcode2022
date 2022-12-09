@@ -1,4 +1,4 @@
-import { input, inputEx } from "../data/input11";
+import { input, inputEx } from "../data/input10";
 import { reducerSum, transposeArraysOfArrays } from "../util/array";
 
 const data = inputEx.split("\n").map((a) => {

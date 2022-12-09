@@ -1,5 +1,5 @@
-import { input, inputEx, inputEx2 } from "../data/input9";
-import { getUnique, reducerSum, arraysEqual } from "../util/array";
+import { input } from "../data/input9";
+import { arraysEqual, getUnique } from "../util/array";
 
 const data = input.split("\n").map((a) => a.split(" "));
 

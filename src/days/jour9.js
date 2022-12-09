@@ -29,25 +29,15 @@ function moveT(h, tInit) {
   let t = [...tInit];
   const diffX = h[0] - t[0];
   const diffY = h[1] - t[1];
-  if (diffX < -1) {
-    t[0]--;
-    if (diffY === 1) t[1]++;
-    if (diffY === -1) t[1]--;
+  const diffXAbs = Math.abs(diffX);
+  const diffYAbs = Math.abs(diffY);
+  if (diffXAbs > 1) {
+    t[0] = t[0] + diffX / diffXAbs;
+    if (diffYAbs === 1) t[1] = t[1] + diffY / diffYAbs;
   }
-  if (diffX > 1) {
-    t[0]++;
-    if (diffY === 1) t[1]++;
-    if (diffY === -1) t[1]--;
-  }
-  if (diffY > 1) {
-    t[1]++;
-    if (diffX === 1) t[0]++;
-    if (diffX === -1) t[0]--;
-  }
-  if (diffY < -1) {
-    t[1]--;
-    if (diffX === 1) t[0]++;
-    if (diffX === -1) t[0]--;
+  if (diffYAbs > 1) {
+    if (diffXAbs === 1) t[0] = t[0] + diffX / diffXAbs;
+    t[1] = t[1] + diffY / diffYAbs;
   }
   return t;
 }

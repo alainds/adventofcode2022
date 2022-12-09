@@ -4,25 +4,66 @@ import { arraysEqual, getUnique } from "../util/array";
 const data = input.split("\n").map((a) => a.split(" "));
 
 function result1() {
-  return getTMovesLength(data, 2);
+  return getTailMovesLength(data, 2);
 }
 function result2() {
-  return getTMovesLength(data, 10);
+  return getTailMovesLength(data, 10);
 }
 export default function getResultats() {
   return [result1(), result2()];
 }
 
-function getTMovesLength(dataInput, taille) {
+function getTailMovesLength(dataInput, taille) {
   let snake = Array.from(Array(taille), () => [0, 0]);
-  let tMoves = [];
+  const tailMoves = [];
   for (let index = 0; index < dataInput.length; index++) {
-    const moves = dataInput[index];
-    const coor = moveSnake(moves, snake, tMoves);
-    snake = coor.snake;
-    tMoves = coor.movesT;
+    const currentMove = dataInput[index];
+    const afterMove = moveSnake({ currentMove, snakeToMove: snake });
+    snake = afterMove.snake;
+    tailMoves.push(...afterMove.tailMoves);
   }
-  return getUnique(tMoves).length;
+  return getUnique(tailMoves).length;
+}
+
+function moveSnake({ currentMove, snakeToMove }) {
+  const snake = [...snakeToMove];
+  const tailMoves = [];
+  const direction = currentMove[0];
+  const steps = parseInt(currentMove[1], 10);
+  for (let index = 0; index < steps; index++) {
+    //on bouge la tete
+    const h = moveHead(snake[0]);
+
+    //on bouge le reste en fonction
+    for (let i = 1; i < snake.length; i++) {
+      if (arraysEqual(snake[i], snake[i - 1])) break;
+      snake[i] = moveT(snake[i - 1], snake[i]);
+    }
+    const t = snake[snake.length - 1];
+    tailMoves.push(t);
+  }
+  return { snake, tailMoves };
+}
+
+function moveHead(head) {
+  const h = [...head];
+  switch (direction) {
+    case "R":
+      h[0]++;
+      break;
+    case "L":
+      h[0]--;
+      break;
+    case "U":
+      h[1]++;
+      break;
+    case "D":
+      h[1]--;
+      break;
+    default:
+      break;
+  }
+  return h;
 }
 
 function moveT(h, tInit) {
@@ -40,38 +81,4 @@ function moveT(h, tInit) {
     t[1] = t[1] + diffY / diffYAbs;
   }
   return t;
-}
-function moveSnake(moves, snakeInit, movesTInit) {
-  const movesT = [...movesTInit];
-  const direction = moves[0];
-  const steps = parseInt(moves[1], 10);
-  const snake = [...snakeInit];
-  for (let index = 0; index < steps; index++) {
-    //on bouge la tete
-    const h = snake[0];
-    switch (direction) {
-      case "R":
-        h[0]++;
-        break;
-      case "L":
-        h[0]--;
-        break;
-      case "U":
-        h[1]++;
-        break;
-      case "D":
-        h[1]--;
-        break;
-      default:
-        break;
-    }
-    //on voit le reste
-    for (let i = 1; i < snake.length; i++) {
-      if (arraysEqual(snake[i], snake[i - 1])) break;
-      snake[i] = moveT(snake[i - 1], snake[i]);
-    }
-    const t = snake[snake.length - 1];
-    movesT.push(t);
-  }
-  return { snake, movesT };
 }

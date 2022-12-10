@@ -8,7 +8,7 @@ import jour6 from "./days/jour6";
 import jour7 from "./days/jour7";
 import jour8 from "./days/jour8";
 import jour9 from "./days/jour9";
-// import jour10 from "./days/jour10"
+import jour10 from "./days/jour10"
 // import jour11 from "./days/jour11"
 // import jour12 from "./days/jour12"
 // import jour13 from "./days/jour13"
@@ -40,7 +40,7 @@ function App() {
     // jour13(),
     // jour12(),
     // jour11(),
-    // jour10(),
+    jour10(),
     jour9(),
     jour8(),
     jour7(),

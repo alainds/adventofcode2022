@@ -44,7 +44,7 @@ function result1() {
   return count[0] * count[1];
 }
 function result2() {
-  const tours = 10000;
+  const tours = 10; //mettre 10000 pour le bon resultat
   let monkeys = input.split("\n\n").map((a) =>
     a
       .split("\n")
